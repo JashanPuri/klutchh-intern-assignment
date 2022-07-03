@@ -9,7 +9,7 @@ const movieSchema = mongoose.Schema(
     overview: {
       type: String,
     },
-    poster_path: {
+    posterUrl: {
       type: String,
     },
     totalRatings: {

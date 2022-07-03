@@ -12,7 +12,12 @@ const getMoviesFromTMDB = async (apiKey, page) => {
   console.log("Status code:", response.status);
 
   if (response.status == 200) {
-    return response.data.results;
+    return response.data.results.map((movie) => {
+      return {
+        ...movie,
+        posterUrl: `https://image.tmdb.org/t/p/original${movie.poster_path}`,
+      };
+    });
   }
 
   return [];
@@ -30,7 +35,7 @@ const populate = async () => {
       const tmdbMovies = await getMoviesFromTMDB(TMDB_API_KEY, page);
       movies = [...movies, ...tmdbMovies];
     }
-
+    console.log(movies[0]);
     console.log(movies.length);
 
     await connectDB(MONGO_URI);
