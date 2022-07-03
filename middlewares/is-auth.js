@@ -10,7 +10,7 @@ exports.isAuth = (req, res, next) => {
       throw new UnauthenticatedError("Not authenticated");
     }
 
-    if (!authorization.startsWith("Bearer ")) {
+    if (!authHeader.startsWith("Bearer ")) {
       throw new UnauthenticatedError("Invalid token format");
     }
 
@@ -24,7 +24,11 @@ exports.isAuth = (req, res, next) => {
 
     next();
   } catch (error) {
+    if (error.name === "JsonWebTokenError") {
+      next(new UnauthenticatedError(`Not authenticated, ${error.message}`));
+    }
+
     console.log(error);
-    next(new UnauthenticatedError("Not authenticated"));
+    next(error);
   }
 };
