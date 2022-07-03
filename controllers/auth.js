@@ -1,5 +1,6 @@
 const authService = require("../services/auth");
 const { StatusCodes } = require("http-status-codes");
+const { BadRequestError } = require("../errors/index");
 
 const signUp = async (req, res, next) => {
   try {
@@ -9,14 +10,35 @@ const signUp = async (req, res, next) => {
 
     const user = await authService.signUpUser(name, username, password);
 
-    const token = authService.createJWT(user);
-
-    res
+    return res
       .status(StatusCodes.CREATED)
-      .json({ user: { name: user.name, username: user.username }, token });
+      .json({ user: { name: user.name, username: user.username } });
   } catch (error) {
     next(error);
   }
 };
 
-module.exports = { signUp };
+const signIn = async (req, res, next) => {
+  try {
+    const username = req.body.username?.trim();
+    const password = req.body.password?.trim();
+
+    if (!username) {
+      throw new BadRequestError("Please provide a username");
+    }
+
+    if (!password) {
+      throw new BadRequestError("Please provide a password");
+    }
+
+    const token = await authService.signInUser(username, password);
+
+    return res.status(StatusCodes.OK).json({
+      token,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { signUp, signIn };
