@@ -6,7 +6,7 @@ const Movie = require("./models/movie");
 
 const getMoviesFromTMDB = async (apiKey, page) => {
   console.log("Fetching popular movies from TMDB");
-  const url = `https://api.themoviedb.org/3/movie/  ?api_key=${apiKey}&&page=${page}`;
+  const url = `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&&page=${page}`;
 
   const response = await axios.get(url);
   console.log("Status code:", response.status);

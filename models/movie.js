@@ -11,6 +11,14 @@ const movieSchema = mongoose.Schema({
   poster_path: {
     type: String,
   },
+  totalRatings: {
+    type: Number,
+    default: 0,
+  },
+  numberOfReviews: {
+    type: Number,
+    default: 0,
+  },
 });
 
-module.exports = mongoose.model("Movie", movieSchema)
+module.exports = mongoose.model("Movie", movieSchema);
