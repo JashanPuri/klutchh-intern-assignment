@@ -5,6 +5,7 @@ const connectDB = require("./db/connect");
 
 // routers
 const authRoutes = require("./routes/auth");
+const movieRoutes = require("./routes/movie");
 
 // middlewares
 // error handlers
@@ -21,6 +22,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/movie", movieRoutes);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);

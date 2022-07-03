@@ -17,4 +17,8 @@ const ratingsSchema = mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Rating", ratingsSchema);
+const Rating = mongoose.model("Rating", ratingsSchema);
+
+Rating.createIndexes({ movieId: 1, userId: 1 });
+
+module.exports = Rating;
