@@ -7,4 +7,6 @@ const router = Router();
 
 router.get("/", isAuth, moviesController.getMoviesList);
 
+router.post("/:movieId/rate", isAuth, moviesController.rateMovie);
+
 module.exports = router;

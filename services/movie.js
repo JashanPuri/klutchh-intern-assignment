@@ -1,9 +1,15 @@
 const Movie = require("../models/movie");
 const Rating = require("../models/ratings");
+const { NotFoundError } = require("../errors/index");
 
 const getUserRatingForMovie = async (userId, movieId) => {
   return await Rating.findOne({ userId, movieId });
 };
+
+function additionDoesOverflow(a, b) {
+  var c = a + b;
+  return a !== c - b || b !== c - a;
+}
 
 const getMoviesFromDB = async (userId, page, limit) => {
   const skip = (page - 1) * limit;
@@ -38,16 +44,44 @@ const getMoviesFromDB = async (userId, page, limit) => {
 
       // const yourRating = await getUserRatingForMovie(userId, movie._id);
 
-      const { _id, title, overview, poster_path } = movie;
+      const { _id, title, overview, posterUrl } = movie;
       return {
         _id,
         title,
         overview,
-        poster_path,
+        posterUrl,
         averageRatings,
       };
     })
   );
 };
 
-module.exports = { getMoviesFromDB };
+const rateMovie = async (movieId, userId, rating) => {
+  const movie = await Movie.findOne({ _id: movieId });
+
+  if (!movie) {
+    throw new NotFoundError("Movie not found");
+  }
+
+  let ratingObj;
+
+  ratingObj = await getUserRatingForMovie(userId, movieId);
+
+  if (!ratingObj) {
+    ratingObj = new Rating({ movieId, userId, rating });
+  } else {
+    movie.totalRatings -= ratingObj.rating;
+    movie.numberOfReviews -= 1;
+    ratingObj.rating = rating;
+  }
+  if (!additionDoesOverflow(movie.totalRatings, rating)) {
+    movie.totalRatings += rating;
+    movie.numberOfReviews += 1;
+  }
+
+  await ratingObj.save();
+
+  await movie.save();
+};
+
+module.exports = { getMoviesFromDB, rateMovie };

@@ -1,4 +1,5 @@
 const { StatusCodes } = require("http-status-codes");
+const { BadRequestError } = require("../errors/index");
 const moviesService = require("../services/movie");
 
 const getMoviesList = async (req, res, next) => {
@@ -15,4 +16,24 @@ const getMoviesList = async (req, res, next) => {
   }
 };
 
-module.exports = { getMoviesList };
+const rateMovie = async (req, res, next) => {
+  try {
+    const movieId = req.params.movieId;
+    const userId = req.user.userId;
+    const rating = Number(req.body.rating);
+
+    if (!rating || rating < 0 || rating > 5) {
+      throw new BadRequestError(
+        "Rating should be a number between 1 and 5 (inclusive)"
+      );
+    }
+
+    await moviesService.rateMovie(movieId, userId, rating);
+
+    res.status(StatusCodes.OK).send();
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { getMoviesList, rateMovie };

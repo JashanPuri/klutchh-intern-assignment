@@ -1,6 +1,6 @@
 const authService = require("../services/auth");
 const { StatusCodes } = require("http-status-codes");
-const { BadRequestError } = require("../errors/index");
+const { BadRequestError, CustomAPIError } = require("../errors/index");
 
 const signUp = async (req, res, next) => {
   try {
@@ -10,9 +10,15 @@ const signUp = async (req, res, next) => {
 
     const user = await authService.signUpUser(name, username, password);
 
-    return res
-      .status(StatusCodes.CREATED)
-      .json({ user: { name: user.name, username: user.username } });
+    if (user) {
+      return res
+        .status(StatusCodes.CREATED)
+        .json({ message: "user registered" });
+    } else {
+      const error = CustomAPIError("Something went wrong");
+      error.statusCode = 500;
+      throw error;
+    }
   } catch (error) {
     next(error);
   }

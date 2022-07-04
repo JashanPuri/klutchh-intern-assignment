@@ -35,8 +35,6 @@ const populate = async () => {
       const tmdbMovies = await getMoviesFromTMDB(TMDB_API_KEY, page);
       movies = [...movies, ...tmdbMovies];
     }
-    console.log(movies[0]);
-    console.log(movies.length);
 
     await connectDB(MONGO_URI);
 
