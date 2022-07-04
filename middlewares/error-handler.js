@@ -1,5 +1,7 @@
 const { CustomAPIError } = require("../errors");
 const { StatusCodes } = require("http-status-codes");
+
+// error handling middleware
 const errorHandlerMiddleware = (err, req, res, next) => {
   if (err instanceof CustomAPIError) {
     return res.status(err.statusCode).json({ msg: err.message });

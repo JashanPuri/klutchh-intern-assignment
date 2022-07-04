@@ -8,6 +8,7 @@ const getMoviesFromTMDB = async (apiKey, page) => {
   console.log("Fetching popular movies from TMDB");
   const url = `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&&page=${page}`;
 
+  // get movies from tmdb api
   const response = await axios.get(url);
   console.log("Status code:", response.status);
 
@@ -23,21 +24,27 @@ const getMoviesFromTMDB = async (apiKey, page) => {
   return [];
 };
 
+// fetch movies from tmdb api and store in mongo db
 const populate = async () => {
   try {
+    // tmdb api key
     const TMDB_API_KEY = process.env.TMDB_API_KEY;
+    // mongodb connection string
     const MONGO_URI = process.env.MONGO_URI;
+
     const totalPages = 2;
 
     let movies = [];
 
     for (let page = 1; page <= totalPages; page++) {
+      // fetch from tmdb api
       const tmdbMovies = await getMoviesFromTMDB(TMDB_API_KEY, page);
       movies = [...movies, ...tmdbMovies];
     }
 
     await connectDB(MONGO_URI);
 
+    // store in mongo db
     await Movie.deleteMany();
     await Movie.create(movies);
     console.log("Movies fetched and added to db");

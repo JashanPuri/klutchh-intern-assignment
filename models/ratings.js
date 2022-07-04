@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+// rating model schema
 const ratingsSchema = mongoose.Schema({
   movieId: {
     type: mongoose.Schema.Types.ObjectId,

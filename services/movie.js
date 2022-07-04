@@ -12,28 +12,17 @@ function additionDoesOverflow(a, b) {
 }
 
 const getMoviesFromDB = async (userId, page, limit) => {
+  // pagination
   const skip = (page - 1) * limit;
 
+  // fetch movies from db
   let movies = await Movie.find().skip(skip).limit(limit);
 
-  //   console.log(
-  //     await Movie.aggregate([
-  //       {
-  //         $lookup: {
-  //           from: "ratings",
-  //           localField: "_id",
-  //           foreignField: "movieId",
-  //           as: "movie_ratings",
-  //         },
-  //       },
-  //     ]).limit(1)
-  //   );
-
-  // calculating average of each movie
-  // extracting the required properties
   return await Promise.all(
     movies.map(async (movie) => {
       let averageRatings;
+
+      // calculating average of each movie
       if (movie.numberOfReviews === 0) {
         averageRatings = null;
       } else {
@@ -42,8 +31,7 @@ const getMoviesFromDB = async (userId, page, limit) => {
         );
       }
 
-      // const yourRating = await getUserRatingForMovie(userId, movie._id);
-
+      // extracting the required properties
       const { _id, title, overview, posterUrl } = movie;
       return {
         _id,
@@ -56,31 +44,42 @@ const getMoviesFromDB = async (userId, page, limit) => {
   );
 };
 
+// rate a movie
 const rateMovie = async (movieId, userId, rating) => {
+  // find movie with given movie id
   const movie = await Movie.findOne({ _id: movieId });
 
+  // movie not found
   if (!movie) {
     throw new NotFoundError("Movie not found");
   }
 
   let ratingObj;
 
+  // get previous rating from user
   ratingObj = await getUserRatingForMovie(userId, movieId);
 
   if (!ratingObj) {
+    // user rating first time
     ratingObj = new Rating({ movieId, userId, rating });
   } else {
+    // user changing the previous rating
     movie.totalRatings -= ratingObj.rating;
     movie.numberOfReviews -= 1;
     ratingObj.rating = rating;
   }
+
+  // check overflow
   if (!additionDoesOverflow(movie.totalRatings, rating)) {
+    // updating total ratings and number of reviews of the movie
     movie.totalRatings += rating;
     movie.numberOfReviews += 1;
   }
 
+  // saving to rating collection
   await ratingObj.save();
 
+  // saving the movie in db
   await movie.save();
 };
 

@@ -1,0 +1,313 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "This is an API for Movies",
+    "version": "1.0.0",
+    "title": "Movies API",
+    "contact": {
+      "email": "jashanpuri7701@gmail.com"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "host": "localhost:3000",
+  "basePath": "/api/v1",
+  "tags": [
+    {
+      "name": "auth",
+      "description": "User authentication"
+    },
+    {
+      "name": "movie",
+      "description": "Operations regarding movies"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/auth/sign-up": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "User sign up",
+        "description": "User can sign up using username and password",
+        "operationId": "userSignUp",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "user",
+            "description": "User to sign up",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "user registered"
+          },
+          "400": {
+            "description": "bad input parameter"
+          }
+        }
+      }
+    },
+    "/auth/sign-in": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "User sign in",
+        "operationId": "userSignIn",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "user",
+            "description": "User to sign in",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/user"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "user signed in",
+            "schema": {
+              "$ref": "#/definitions/inline_response_200"
+            }
+          },
+          "400": {
+            "description": "bad input parameter"
+          }
+        }
+      }
+    },
+    "/movie": {
+      "get": {
+        "tags": [
+          "movie"
+        ],
+        "summary": "Fetch a list of movies",
+        "description": "Fetch a list of movies by the use of access token provided",
+        "operationId": "getMoviesList",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "JWT access token. Should be passed as 'Bearer \\<token\\>'",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "page number for pagination",
+            "required": false,
+            "type": "number",
+            "default": 1
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "number of movies present in a sinle page",
+            "required": false,
+            "type": "number",
+            "default": 20,
+            "maximum": 20,
+            "minimum": 1
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list of movies",
+            "schema": {
+              "$ref": "#/definitions/inline_response_200_1"
+            }
+          },
+          "401": {
+            "description": "Not authenticated"
+          }
+        }
+      }
+    },
+    "/movie/{movieId}/rate": {
+      "post": {
+        "tags": [
+          "movie"
+        ],
+        "summary": "Rate a movie",
+        "description": "Rate a movie",
+        "operationId": "rateMovie",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "JWT access token. Should be passed as 'Bearer \\<token\\>'",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "movieId",
+            "in": "path",
+            "description": "Id of the movie to be rated",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "rating",
+            "description": "Rating given to the movie by the signed in user",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/rating"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "movie rated"
+          },
+          "401": {
+            "description": "Not authenticated"
+          },
+          "404": {
+            "description": "Movie not found"
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "bearerAuth": {
+      "description": "JWT Authorization header",
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "definitions": {
+    "User": {
+      "type": "object",
+      "required": [
+        "name",
+        "password",
+        "username"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "name"
+        },
+        "username": {
+          "type": "string",
+          "example": "username"
+        },
+        "password": {
+          "type": "string",
+          "example": "password"
+        }
+      }
+    },
+    "Movie": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "title": {
+          "type": "string",
+          "example": "Minions"
+        },
+        "overview": {
+          "type": "string",
+          "example": "overview of the movie"
+        },
+        "posterUrl": {
+          "type": "string",
+          "format": "url",
+          "example": "https://image.tmdb.org/t/p/original/movie.jpg"
+        },
+        "averageRatings": {
+          "type": "number",
+          "example": 4.5
+        }
+      }
+    },
+    "user": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "example": "username"
+        },
+        "password": {
+          "type": "string",
+          "example": "password"
+        }
+      }
+    },
+    "inline_response_200": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string",
+          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+        }
+      }
+    },
+    "inline_response_200_1": {
+      "type": "object",
+      "properties": {
+        "movies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Movie"
+          }
+        }
+      }
+    },
+    "rating": {
+      "type": "object",
+      "properties": {
+        "rating": {
+          "type": "number",
+          "example": 3.5,
+          "minimum": 1,
+          "maximum": 5
+        }
+      }
+    }
+  }
+}
