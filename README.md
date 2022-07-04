@@ -13,7 +13,8 @@ Assignment for internship at klutchh - Movies API
 
 #### 3. Run the following commands
 1. npm install
-2. npm start
+2. node populate-movies.js
+3. npm start
 
 ### Documentation of the API
 After running the server go to the following path to see the docs of the api
